@@ -66,7 +66,12 @@ public enum PluginEnum {
      * OAuth2 plugin enum.
      */
     OAUTH2(40, 0, "oauth2"),
-    
+
+    /**
+     * Casdoor plugin enum.
+     */
+    CASDOOR(40, 0, "casdoor"),
+
     /**
      * Waf plugin enum.
      */
@@ -233,6 +238,11 @@ public enum PluginEnum {
     MOTAN(310, 0, "motan"),
 
     /**
+     * Motan plugin enum.
+     */
+    BRPC(310, 0, "brpc"),
+
+    /**
      * Cryptor response plugin enum.
      */
     CRYPTOR_RESPONSE(410, 0, "cryptorResponse"),
@@ -240,7 +250,12 @@ public enum PluginEnum {
     /**
      * Response plugin enum.
      */
-    RESPONSE(420, 0, "response");
+    RESPONSE(420, 0, "response"),
+
+    /**
+     * Key-auth plugin enum.
+     */
+    KEY_AUTH(430, 0, "keyAuth");
     
     /**
      * When the application starts, the plugin is cached and we can obtained by name.

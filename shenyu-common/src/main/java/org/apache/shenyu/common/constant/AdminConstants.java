@@ -33,6 +33,11 @@ public final class AdminConstants {
     public static final String PLUGIN_NAME_IS_EXIST = "The plugin name already exists and can't be added repeatedly!";
 
     /**
+     * The constant RESOURCE_NAME_IS_EXIST.
+     */
+    public static final String RESOURCE_NAME_IS_EXIST = "The resource name already exists and can't be added repeatedly!";
+
+    /**
      * The constant ID_NOT_EXIST.
      */
     public static final String ID_NOT_EXIST = "ID NOT EXIST!";
@@ -51,6 +56,11 @@ public final class AdminConstants {
      * The constant SYS_PLUGIN_ID_NOT_EXIST.
      */
     public static final String SYS_PLUGIN_ID_NOT_EXIST = "The plugin(s) does not exist！";
+
+    /**
+     * The constant SYS_API_ID_NOT_EXIST.
+     */
+    public static final String SYS_API_ID_NOT_EXIST = "The api(s) does not exist！";
 
     /**
      * The constant DATA_PATH_IS_EXIST.
@@ -251,5 +261,7 @@ public final class AdminConstants {
      * the constant api document environment dict name.
      */
     public static final String DICT_TYPE_API_DOC_ENV = "apidocEnv";
+
+    public static final String TAG_ROOT_PARENT_ID = "0";
 
 }

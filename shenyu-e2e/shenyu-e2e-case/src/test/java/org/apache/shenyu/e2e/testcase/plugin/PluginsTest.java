@@ -35,12 +35,16 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.testcontainers.shaded.com.google.common.collect.Lists;
+
+import java.util.List;
 
 @ShenYuTest(
-        mode = Mode.HOST,
+        mode = Mode.DOCKER,
         services = {
                 @ServiceConfigure(
                         serviceName = "admin",
+                        port = 9095,
                         baseUrl = "http://{hostname:localhost}:9095",
                         parameters = {
                                 @Parameter(key = "username", value = "admin"),
@@ -49,12 +53,15 @@ import org.junit.jupiter.api.BeforeEach;
                 ),
                 @ServiceConfigure(
                         serviceName = "gateway",
+                        port = 9195,
                         baseUrl = "http://{hostname:localhost}:9195",
                         type = ServiceType.SHENYU_GATEWAY
                 )
-        }
+        },
+        dockerComposeFile = "classpath:./docker-compose.{storage:h2}.yml"
 )
 public class PluginsTest {
+    List<String> selectorIds = Lists.newArrayList();
     
     @BeforeAll
     static void setup(AdminClient client) {
@@ -69,26 +76,27 @@ public class PluginsTest {
         ResourcesData resources = spec.getResources();
         for (Resource res : resources.getResources()) {
             SelectorDTO dto = client.create(res.getSelector());
+            selectorIds.add(dto.getId());
             
             res.getRules().forEach(rule -> {
                 rule.setSelectorId(dto.getId());
                 client.create(rule);
             });
         }
-        
+
         spec.getWaiting().waitFor(gateway);
     }
     
     @ShenYuScenario(provider = DividePluginCases.class)
     void testDivide(GatewayClient gateway, CaseSpec spec) {
-        spec.getVerifiers()
-                .forEach(verifier -> verifier.verify(gateway.getHttpRequesterSupplier().get()));
+        spec.getVerifiers().forEach(verifier -> verifier.verify(gateway.getHttpRequesterSupplier().get()));
     }
     
     @AfterEach
     void before(AdminClient client, GatewayClient gateway, AfterEachSpec spec) {
-        spec.getDeleter().delete(client);
+        spec.getDeleter().delete(client, selectorIds);
         spec.getPostChecker().check(gateway);
+        selectorIds = Lists.newArrayList();
     }
     
     @AfterAll

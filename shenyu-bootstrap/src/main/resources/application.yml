@@ -20,7 +20,6 @@ server:
 spring:
   main:
     allow-bean-definition-overriding: true
-    allow-circular-references: true
   application:
     name: shenyu-bootstrap
   codec:
@@ -67,9 +66,14 @@ management:
       enabled: false
 
 shenyu:
+  trie:
+    childrenSize: 10000
+    pathVariableSize: 1000
+    pathRuleCacheSize: 1000
+    matchMode: antPathMatch
   matchCache:
-    enabled: false
-    maxFreeMemory: 256 # 256MB
+    selectorEnabled: false
+    maxSelectorFreeMemory: 256 # 256MB
   netty:
     http:
       # set to false, user can custom the netty tcp server config.
@@ -147,7 +151,7 @@ shenyu:
 #      selectCount: 1
 #      workerCount: 8
 #      daemon: true
-  instance:
+  register:
     enabled: false
     registerType: zookeeper #etcd #consul
     serverLists: localhost:2181 #http://localhost:2379 #localhost:8848

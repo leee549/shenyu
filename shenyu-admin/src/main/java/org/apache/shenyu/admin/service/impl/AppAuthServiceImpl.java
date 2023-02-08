@@ -262,7 +262,7 @@ public class AppAuthServiceImpl implements AppAuthService {
         AppAuthDO appAuthDO = AppAuthDO.create(appAuthDTO);
         DataEventTypeEnum eventType;
         if (StringUtils.isBlank(appAuthDTO.getId())) {
-            appAuthDO.setAppSecret(SignUtils.getInstance().generateKey());
+            appAuthDO.setAppSecret(SignUtils.generateKey());
             appAuthCount = appAuthMapper.insertSelective(appAuthDO);
             eventType = DataEventTypeEnum.CREATE;
         } else {
@@ -286,30 +286,28 @@ public class AppAuthServiceImpl implements AppAuthService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(final List<String> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return 0;
+        }
+        List<AppAuthDO> appAuthList = appAuthMapper.selectByIds(ids);
+        if (CollectionUtils.isEmpty(appAuthList)) {
+            return 0;
+        }
         int affectCount = appAuthMapper.deleteByIds(ids);
-        authParamMapper.deleteByAuthIds(ids);
-        authPathMapper.deleteByAuthIds(ids);
         if (affectCount <= 0) {
             return affectCount;
         }
+        authParamMapper.deleteByAuthIds(ids);
+        authPathMapper.deleteByAuthIds(ids);
 
-        List<AppAuthDO> appAuthList = appAuthMapper.selectByIds(ids);
-        if (CollectionUtils.isEmpty(appAuthList)) {
-            return affectCount;
-        }
-
-        List<AppAuthData> appAuthData = new ArrayList<>(appAuthList.size());
-        appAuthList.forEach(appAuthDO -> {
-            AppAuthData data = AppAuthData.builder()
-                    .appKey(appAuthDO.getAppKey())
-                    .appSecret(appAuthDO.getAppSecret())
-                    .open(appAuthDO.getOpen())
-                    .enabled(appAuthDO.getEnabled())
-                    .paramDataList(null)
-                    .pathDataList(null)
-                    .build();
-            appAuthData.add(data);
-        });
+        List<AppAuthData> appAuthData = appAuthList.stream().map(appAuthDO -> AppAuthData.builder()
+            .appKey(appAuthDO.getAppKey())
+            .appSecret(appAuthDO.getAppSecret())
+            .open(appAuthDO.getOpen())
+            .enabled(appAuthDO.getEnabled())
+            .paramDataList(null)
+            .pathDataList(null)
+            .build()).collect(Collectors.toCollection(() -> new ArrayList<>(appAuthList.size())));
         // publish delete event of AppAuthData
         eventPublisher.publishEvent(new DataChangedEvent(ConfigGroupEnum.APP_AUTH, DataEventTypeEnum.DELETE, appAuthData));
 

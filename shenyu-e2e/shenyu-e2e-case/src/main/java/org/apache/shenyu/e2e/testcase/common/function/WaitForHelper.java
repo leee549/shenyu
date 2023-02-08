@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Assertions;
 import org.slf4j.MDC;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,7 +52,10 @@ public class WaitForHelper {
     public Duration timeout = Duration.ofMinutes(3);
     
     public void waitFor(Supplier<RequestSpecification> supplier, Method method, String endpoint, ResponseSpecification expected) throws TimeoutException {
+        final Map<String, String> contextMap = MDC.getCopyOfContextMap();
         Future<?> future = executor.submit(() -> {
+            MDC.setContextMap(contextMap);
+            
             for (int i = 0; i < retryTimes; i++) {
                 try {
                     ValidatableResponse response = supplier.get()
@@ -65,20 +69,19 @@ public class WaitForHelper {
                     }
                     return;
                 } catch (AssertionError e) {
-                    log.info("failed to check endpoint '" + endpoint + "'\n {}", e.getMessage());
+                    log.debug("failed to check endpoint '" + endpoint + "'\n {}", e.getMessage());
                 }
                 
                 try {
                     TimeUnit.MILLISECONDS.sleep(timeInRetry.toMillis());
                 } catch (InterruptedException ignore) {
-                    break;
                 }
             }
-            log.info("check endpoint({}) successful", endpoint);
         });
         
         try {
             future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            log.info("check endpoint({}) successful", endpoint);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             future.cancel(true);
             throw new TimeoutException("checking endpoint '" + endpoint + "' timeout after " + timeout);
@@ -87,13 +90,16 @@ public class WaitForHelper {
     
     
     public void waitFor(Supplier<RequestSpecification> supplier, HttpChecker checker) throws TimeoutException {
+        final Map<String, String> contextMap = MDC.getCopyOfContextMap();
         Future<?> future = executor.submit(() -> {
+            MDC.setContextMap(contextMap);
+            
             for (int i = 0; i < retryTimes; i++) {
                 try {
                     checker.check(supplier);
                     return;
                 } catch (AssertionError e) {
-                    log.info(e.getMessage());
+                    log.debug(e.getMessage());
                 }
                 
                 try {

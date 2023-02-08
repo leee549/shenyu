@@ -83,6 +83,11 @@ public interface Constants {
     String MOTAN_RPC_RESULT_EMPTY = "motan has not return value!";
 
     /**
+     * The constant BRPC_RPC_RESULT_EMPTY.
+     */
+    String BRPC_RPC_RESULT_EMPTY = "brpc has not return value!";
+
+    /**
      * The constant CLIENT_RESPONSE_RESULT_TYPE.
      */
     String CLIENT_RESPONSE_RESULT_TYPE = "webHandlerClientResponseResultType";
@@ -146,6 +151,16 @@ public interface Constants {
      * The constant MODULE.
      */
     String MODULE = "module";
+
+    /**
+     * RESPONSE_MONO.
+     */
+    String RESPONSE_MONO = "RESPONSE_MONO";
+
+    /**
+     * WATCHER_HTTP_STATUS.
+     */
+    String WATCHER_HTTP_STATUS = "WATCHER_HTTP_STATUS";
 
     /**
      * The constant METHOD.
@@ -527,6 +542,11 @@ public interface Constants {
      */
     String URI_PATH = "/shenyu-client/register-uri";
 
+
+    String API_DOC_TYPE = "apiDoc";
+
+    String API_DOC_PATH = "/shenyu-client/register-apiDoc";
+
     /**
      * When register by http, the login path.
      */
@@ -628,6 +648,11 @@ public interface Constants {
     String CACHED = "cached";
 
     /**
+     * user can use the specify-domian to replace of upstream url of the divide plugin.
+     */
+    String SPECIFY_DOMAIN = "specify-domain";
+
+    /**
      * The maximum free memory reserved by the blocking queue for the JVM.
      */
     int THE_256_MB = 256 * 1024 * 1024;
@@ -636,6 +661,16 @@ public interface Constants {
      * The default cluster of dubbo client.
      */
     String DEFAULT_CLUSTER = "failover";
+
+    /**
+     * cache data max size, means map size.
+     */
+    Long LRU_MAP_MAXSIZE = 65536L;
+
+    /**
+     * namespace,sush as nacos .
+     */
+    String NAMESPACE = "namespace";
 
     /**
      * String q.

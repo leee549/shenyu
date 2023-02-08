@@ -18,7 +18,8 @@
 package org.apache.shenyu.plugin.base.cache;
 
 import com.google.common.collect.Maps;
-import org.apache.shenyu.common.cache.MemorySafeLRUMap;
+import org.apache.shenyu.common.cache.MemorySafeWindowTinyLFUMap;
+import org.apache.shenyu.common.dto.RuleData;
 import org.apache.shenyu.common.dto.SelectorData;
 
 import java.util.Map;
@@ -37,6 +38,12 @@ public final class MatchDataCache {
      * pluginName -> LRUMap.
      */
     private static final ConcurrentMap<String, Map<String, SelectorData>> SELECTOR_DATA_MAP = Maps.newConcurrentMap();
+
+    /**
+     * plugin name -> LRU Map.
+     * LRU Map: path -> rule data.
+     */
+    private static final ConcurrentMap<String, Map<String, RuleData>> RULE_DATA_MAP = Maps.newConcurrentMap();
 
     private MatchDataCache() {
     }
@@ -74,7 +81,7 @@ public final class MatchDataCache {
      * @param maxMemory    the max memory
      */
     public void cacheSelectorData(final String path, final SelectorData selectorData, final Integer maxMemory) {
-        SELECTOR_DATA_MAP.computeIfAbsent(selectorData.getPluginName(), map -> new MemorySafeLRUMap<>(maxMemory, 1 << 16)).put(path, selectorData);
+        SELECTOR_DATA_MAP.computeIfAbsent(selectorData.getPluginName(), map -> new MemorySafeWindowTinyLFUMap<>(maxMemory, 1 << 16)).put(path, selectorData);
     }
 
     /**

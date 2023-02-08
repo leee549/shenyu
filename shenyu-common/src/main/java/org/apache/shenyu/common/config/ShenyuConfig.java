@@ -17,8 +17,9 @@
 
 package org.apache.shenyu.common.config;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shenyu.common.concurrent.MemoryLimitCalculator;
-import org.springframework.util.StringUtils;
+import org.apache.shenyu.common.enums.TrieMatchModeEvent;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,8 +53,6 @@ public class ShenyuConfig {
     private UpstreamCheck upstreamCheck = new UpstreamCheck();
 
     private CrossFilterConfig cross = new CrossFilterConfig();
-    
-    private InstanceConfig instance = new InstanceConfig();
 
     private RibbonConfig ribbon = new RibbonConfig();
     
@@ -64,6 +63,8 @@ public class ShenyuConfig {
     private SharedPool sharedPool = new SharedPool();
     
     private MetricsConfig metrics = new MetricsConfig();
+
+    private ShenyuTrieConfig trie = new ShenyuTrieConfig();
     
     /**
      * Gets health.
@@ -154,25 +155,7 @@ public class ShenyuConfig {
     public void setRibbon(final RibbonConfig ribbon) {
         this.ribbon = ribbon;
     }
-    
-    /**
-     * Gets instance.
-     *
-     * @return the instance
-     */
-    public InstanceConfig getInstance() {
-        return instance;
-    }
-    
-    /**
-     * Sets instance.
-     *
-     * @param instance the instance
-     */
-    public void setInstance(final InstanceConfig instance) {
-        this.instance = instance;
-    }
-    
+
     /**
      * Gets switch config.
      *
@@ -352,7 +335,25 @@ public class ShenyuConfig {
     public void setCross(final CrossFilterConfig cross) {
         this.cross = cross;
     }
-    
+
+    /**
+     * get shenyu trie config.
+     *
+     * @return shenyu trie config
+     */
+    public ShenyuTrieConfig getTrie() {
+        return trie;
+    }
+
+    /**
+     * set shenyu trie config.
+     *
+     * @param trie trie config
+     */
+    public void setTrie(final ShenyuTrieConfig trie) {
+        this.trie = trie;
+    }
+
     /**
      * The type Scheduler.
      */
@@ -531,47 +532,48 @@ public class ShenyuConfig {
      */
     public static class MatchCache {
 
-        private boolean enabled;
+        private boolean selectorEnabled;
 
         /**
          * Max free memory, unit mb.
          */
-        private Integer maxFreeMemory = 256;
+        private Integer maxSelectorFreeMemory = 256;
 
         /**
-         * Gets enabled.
+         * Get selector cache enabled.
          *
          * @return the enabled
          */
-        public boolean getEnabled() {
-            return enabled;
+        public boolean getSelectorEnabled() {
+            return selectorEnabled;
         }
 
         /**
-         * Sets enabled.
+         * Set selector enabled.
          *
-         * @param enabled the enabled
+         * @param selectorEnabled the enabled
          */
-        public void setEnabled(final boolean enabled) {
-            this.enabled = enabled;
+        public void setSelectorEnabled(final boolean selectorEnabled) {
+            this.selectorEnabled = selectorEnabled;
         }
+
 
         /**
          * Gets maxFreeMemory.
          *
          * @return the maxFreeMemory
          */
-        public Integer getMaxFreeMemory() {
-            return maxFreeMemory;
+        public Integer getMaxSelectorFreeMemory() {
+            return maxSelectorFreeMemory;
         }
 
         /**
          * Sets maxFreeMemory.
          *
-         * @param maxFreeMemory the maxFreeMemory
+         * @param maxSelectorFreeMemory the maxFreeMemory
          */
-        public void setMaxFreeMemory(final Integer maxFreeMemory) {
-            this.maxFreeMemory = maxFreeMemory;
+        public void setMaxSelectorFreeMemory(final Integer maxSelectorFreeMemory) {
+            this.maxSelectorFreeMemory = maxSelectorFreeMemory;
         }
     }
     
@@ -985,7 +987,7 @@ public class ShenyuConfig {
          */
         private String wrapperHeaders(final String headers) {
             final Set<String> headerSet = DEFAULT_ALLOWED_HEADERS;
-            if (StringUtils.hasText(headers)) {
+            if (StringUtils.isNotEmpty(headers)) {
                 headerSet.addAll(Stream.of(headers.split(",")).collect(Collectors.toSet()));
             }
             return String.join(",", headerSet);
@@ -1239,112 +1241,6 @@ public class ShenyuConfig {
             public void setOriginRegex(final String originRegex) {
                 this.originRegex = originRegex;
             }
-        }
-    }
-    
-    /**
-     * The type Instance config.
-     */
-    public static class InstanceConfig {
-    
-        private boolean enabled;
-    
-        private String registerType;
-    
-        private String serverLists;
-    
-        private Properties props = new Properties();
-    
-        /**
-         * Instantiates a new Instance config.
-         */
-        public InstanceConfig() {
-        
-        }
-    
-        /**
-         * Instantiates a new Instance config.
-         *
-         * @param registerType the register type
-         * @param serverLists the server lists
-         * @param props the props
-         */
-        public InstanceConfig(final String registerType, final String serverLists, final Properties props) {
-            this.registerType = registerType;
-            this.serverLists = serverLists;
-            this.props = props;
-        }
-    
-        /**
-         * Gets enabled.
-         *
-         * @return the enabled
-         */
-        public boolean getEnabled() {
-            return enabled;
-        }
-    
-        /**
-         * Sets enabled.
-         *
-         * @param enabled the enabled
-         */
-        public void setEnabled(final boolean enabled) {
-            this.enabled = enabled;
-        }
-    
-        /**
-         * getRegisterType.
-         *
-         * @return String register type
-         */
-        public String getRegisterType() {
-            return registerType;
-        }
-    
-        /**
-         * setRegisterType.
-         *
-         * @param registerType registerType
-         */
-        public void setRegisterType(final String registerType) {
-            this.registerType = registerType;
-        }
-    
-        /**
-         * getServerLists.
-         *
-         * @return String server lists
-         */
-        public String getServerLists() {
-            return serverLists;
-        }
-    
-        /**
-         * setServerLists.
-         *
-         * @param serverLists serverLists
-         */
-        public void setServerLists(final String serverLists) {
-            this.serverLists = serverLists;
-        }
-    
-        /**
-         * getProps.
-         *
-         * @return String props
-         */
-        public Properties getProps() {
-            return props;
-        }
-    
-        /**
-         * setProps.
-         *
-         * @param props props
-         */
-        public void setProps(final Properties props) {
-            this.props = props;
         }
     }
     
@@ -1790,6 +1686,95 @@ public class ShenyuConfig {
          */
         public void setProps(final Properties props) {
             this.props = props;
+        }
+    }
+
+    /**
+     * shenyu trie config.
+     */
+    public static class ShenyuTrieConfig {
+        private Long childrenSize = 10000L;
+
+        private Long pathRuleCacheSize = 1000L;
+        
+        private Long pathVariableSize = 1000L;
+
+        /**
+         * match mode.
+         * @see TrieMatchModeEvent
+         */
+        private String matchMode = TrieMatchModeEvent.ANT_PATH_MATCH.getMatchMode();
+
+        /**
+         * get trie children size.
+         *
+         * @return trie children size
+         */
+        public Long getChildrenSize() {
+            return childrenSize;
+        }
+
+        /**
+         * set trie children size.
+         *
+         * @param childrenSize trie children size
+         */
+        public void setChildrenSize(final Long childrenSize) {
+            this.childrenSize = childrenSize;
+        }
+
+        /**
+         * get path rule cache size.
+         *
+         * @return path rule cache size
+         */
+        public Long getPathRuleCacheSize() {
+            return pathRuleCacheSize;
+        }
+
+        /**
+         * set path rule cache size.
+         *
+         * @param pathRuleCacheSize path rule cache size
+         */
+        public void setPathRuleCacheSize(final Long pathRuleCacheSize) {
+            this.pathRuleCacheSize = pathRuleCacheSize;
+        }
+        
+        /**
+         * get path variable node size.
+         *
+         * @return path variable node size
+         */
+        public Long getPathVariableSize() {
+            return pathVariableSize;
+        }
+    
+        /**
+         * set path variable node size.
+         *
+         * @param pathVariableSize path variable node size
+         */
+        public void setPathVariableSize(final Long pathVariableSize) {
+            this.pathVariableSize = pathVariableSize;
+        }
+    
+        /**
+         * get match mode.
+         *
+         * @return motch mode
+         */
+        public String getMatchMode() {
+            return matchMode;
+        }
+
+        /**
+         * set match mode.
+         *
+         * @param matchMode match mode
+         */
+        public void setMatchMode(final String matchMode) {
+            this.matchMode = matchMode;
         }
     }
 }

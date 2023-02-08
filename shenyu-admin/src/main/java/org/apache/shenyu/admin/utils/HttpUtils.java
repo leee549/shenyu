@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 public class HttpUtils {
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
-    private Map<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
+    private Map<String, List<Cookie>> cookieStore = new HashMap<>();
 
     private OkHttpClient httpClient;
 
@@ -199,13 +199,10 @@ public class HttpUtils {
         addHeader(requestBuilder, header);
 
         Request request = requestBuilder.build();
-        Response response = httpClient
+        try (Response response = httpClient
             .newCall(request)
-            .execute();
-        try {
+            .execute()) {
             return response.body().string();
-        } finally {
-            response.close();
         }
     }
 
@@ -227,13 +224,10 @@ public class HttpUtils {
         addHeader(requestBuilder, header);
 
         Request request = requestBuilder.build();
-        Response response = httpClient
+        try (Response response = httpClient
             .newCall(request)
-            .execute();
-        try {
+            .execute()) {
             return response.body().string();
-        } finally {
-            response.close();
         }
     }
 
@@ -302,7 +296,7 @@ public class HttpUtils {
      */
     public Response requestCall(final String url, final Map<String, ?> form, final Map<String, String> header,
         final HTTPMethod method, final List<UploadFile> files) throws IOException {
-        if (Objects.nonNull(files) && files.size() > 0) {
+        if (Objects.nonNull(files) && !files.isEmpty()) {
             return requestFile(url, form, header, files);
         } else {
             return requestForResponse(url, form, header, method);
